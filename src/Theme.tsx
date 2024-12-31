@@ -15,7 +15,7 @@ const Theme = createTheme({
   },
   typography: {
     fontFamily: [
-      'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', 'sans-serif'].join(',')
+      'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', 'sans-serif'].join(','),
   }
 })
 
