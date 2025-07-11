@@ -1,4 +1,4 @@
-import { Recipe } from './RecipeCard';
+import { Recipe } from '../Types/Recipe';
 import RecipeCard from './RecipeCard';
 import Stack from '@mui/material/Stack';
 
@@ -10,9 +10,10 @@ export default function RecipeBox(props: Props) {
   const { recipes } = props;
 
   return (
-    <Stack direction='row' justifyContent='center' sx={{ marginRight: 0 }}>
+    <Stack direction='column' justifyContent='center' sx={{ marginRight: 0 }}>
       {recipes.map((p: Recipe) => (
         <RecipeCard
+          key={p.title}
           title={p.title}
           ingredients={p.ingredients}
           instructions={p.instructions}

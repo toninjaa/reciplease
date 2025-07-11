@@ -1,15 +1,13 @@
+import { useState } from 'react';
+import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
-import Typography from "@mui/material/Typography";
-
-export type Recipe = {
-  title: string,
-  ingredients: [number, string, string][],
-  instructions: string[],
-  yields?: [number, string],
-  nutritionFacts?: [string, number][],
-  source?: string,
-}
+import Typography from '@mui/material/Typography';
+import Fraction from 'fraction.js';
+import { Recipe } from '../Types/Recipe';
 
 export default function RecipeCard(props: Recipe) {
   const {
@@ -20,30 +18,51 @@ export default function RecipeCard(props: Recipe) {
     nutritionFacts,
     source,
   } = props;
+  const [amount, setAmount] = useState({
+    multiplication: 1,
+    yield: yields ? yields.amount : 1,
+    updatedIngredients: ingredients,
+  });
+
+  function handleChange(event: SelectChangeEvent<number>) {
+    const multiplier = event.target.value as number;
+
+    setAmount({
+      multiplication: multiplier,
+      yield: yields ? (yields.amount * multiplier) : 1,
+      updatedIngredients: ingredients.map((x) => ({
+        amount: x.amount * multiplier,
+        amountName: x.amountName,
+        name: x.name
+      })),
+    });
+  }
 
   return (
-    <Paper elevation={6} sx={{ backgroundColor: 'white', padding: '2em' }}>
+    <Paper
+      elevation={14}
+      sx={{
+        width: '50em',
+        backgroundColor: 'white',
+        padding: '2em',
+        margin: '2em',
+      }}
+    >
       <Stack
         direction='column'
         alignItems='flex-start'
         justifyContent='flex-start'
         sx={{ backgroundColor: 'white' }}
       >
+
         <Typography
           color='secondary'
           variant='h3'
-          sx={{ textDecoration: 'underline', marginBottom: '.25em' }}
+          sx={{ textDecoration: 'underline' }}
         >
           {title}
         </Typography>
-        
-        <Typography
-          color='secondary'
-          variant='subtitle2'
-        >
-          {yields !== undefined ? `Yields: ${yields[0]} ${yields[1]}` : ''}
-        </Typography>
-        
+
         {source !== undefined &&
           <Typography
             color='secondary'
@@ -53,6 +72,44 @@ export default function RecipeCard(props: Recipe) {
             Source: <a href={source} target='_blank'>{source}</a>
           </Typography>
         }
+
+        <Stack
+          direction='row'
+          alignItems='center'
+          sx={{ paddingBottom: '1em' }}
+        >
+          <Box
+            sx={{
+              alignContent: 'center',
+              borderRadius: 1,
+              '&:hover': {
+                bgcolor: 'primary',
+              },
+            }}
+          >
+            <FormControl fullWidth>
+              <Select
+                id="yield-select"
+                value={amount.multiplication}
+                onChange={handleChange}
+              >
+                <MenuItem value={0.5}>1/2x</MenuItem>
+                <MenuItem value={1}>1x</MenuItem>
+                <MenuItem value={2}>2x</MenuItem>
+                <MenuItem value={3}>3x</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          <Typography
+            color='secondary'
+            variant='h5'
+            sx={{
+              paddingLeft: '1em'
+            }}
+          >
+            {yields !== undefined ? `Yields: ${new Fraction(amount.yield).toFraction(true)} ${yields.name}` : ''}
+          </Typography>
+        </Stack>
         
         <Typography
           color='secondary'
@@ -62,12 +119,13 @@ export default function RecipeCard(props: Recipe) {
           Ingredients
         </Typography>
         
-        {ingredients.length > 0 && ingredients.map((i) => (
+        {amount.updatedIngredients.length > 0 && amount.updatedIngredients.map((i) => (
           <Typography
+            key={i.name}
             color='secondary'
             sx={{ textTransform: 'capitalize', marginBottom: '.25em' }}
           >
-            {i[0]} {i[1]} {i[2]}
+            {new Fraction(i.amount).toFraction(true)} {i.amountName} {i.name}
           </Typography>
         ))}
         
@@ -80,6 +138,7 @@ export default function RecipeCard(props: Recipe) {
         
         {instructions.length > 0 && instructions.map((instruct, i) => (
           <Typography
+            key={i}
             color='secondary'
             sx={{ marginBottom: '.25em' }}
           >
@@ -97,11 +156,12 @@ export default function RecipeCard(props: Recipe) {
         
         {nutritionFacts !== undefined && nutritionFacts.length > 0 && nutritionFacts?.map((nf) => (
           <Typography
+            key={nf.name}
             color='secondary'
             variant='body2'
             sx={{ textTransform: 'capitalize' }}
           >
-            {nf[0]}: {nf[1]}
+            {nf.name}: {nf.amount}
           </Typography>
         ))}
 
