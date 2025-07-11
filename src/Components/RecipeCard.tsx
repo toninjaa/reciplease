@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
-// import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import Fraction from 'fraction.js';
 import { Recipe } from '../Types/Recipe';
 
 export default function RecipeCard(props: Recipe) {
@@ -24,11 +24,6 @@ export default function RecipeCard(props: Recipe) {
     updatedIngredients: ingredients,
   });
 
-  // function multiplyIngredients(multiplier: number, ingredients: Ingredients[]) {
-  //   console.log('mulitplier ingredients before: ', ingredients)
-  //   return ingredients.map((x) => x.amount * multiplier)
-  // }
-
   function handleChange(event: SelectChangeEvent<number>) {
     const multiplier = event.target.value as number;
 
@@ -44,53 +39,30 @@ export default function RecipeCard(props: Recipe) {
   }
 
   return (
-    <Paper elevation={6} sx={{ backgroundColor: 'white', padding: '2em' }}>
+    <Paper
+      elevation={14}
+      sx={{
+        width: '50em',
+        backgroundColor: 'white',
+        padding: '2em',
+        margin: '2em',
+      }}
+    >
       <Stack
         direction='column'
         alignItems='flex-start'
         justifyContent='flex-start'
         sx={{ backgroundColor: 'white' }}
       >
-        <Box
-          sx={{
-            alignContent: 'center',
-            borderRadius: 1,
-            bgcolor: 'primary.main',
-            '&:hover': {
-              bgcolor: 'primary.dark',
-            },
-          }}
-        >
-          <FormControl fullWidth>
-            {/* <InputLabel id="yield-label">Amount</InputLabel> */}
-            <Select
-              labelId="yield-select-label"
-              id="yield-select"
-              value={amount.multiplication}
-              label="Yield"
-              onChange={handleChange}
-            >
-              <MenuItem value={1}>1x</MenuItem>
-              <MenuItem value={2}>2x</MenuItem>
-              <MenuItem value={3}>3x</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
+
         <Typography
           color='secondary'
           variant='h3'
-          sx={{ textDecoration: 'underline', marginBottom: '.25em' }}
+          sx={{ textDecoration: 'underline' }}
         >
           {title}
         </Typography>
-        
-        <Typography
-          color='secondary'
-          variant='subtitle2'
-        >
-          {yields !== undefined ? `Yields: ${amount.yield} ${yields.name}` : ''}
-        </Typography>
-        
+
         {source !== undefined &&
           <Typography
             color='secondary'
@@ -100,6 +72,44 @@ export default function RecipeCard(props: Recipe) {
             Source: <a href={source} target='_blank'>{source}</a>
           </Typography>
         }
+
+        <Stack
+          direction='row'
+          alignItems='center'
+          sx={{ paddingBottom: '1em' }}
+        >
+          <Box
+            sx={{
+              alignContent: 'center',
+              borderRadius: 1,
+              '&:hover': {
+                bgcolor: 'primary',
+              },
+            }}
+          >
+            <FormControl fullWidth>
+              <Select
+                id="yield-select"
+                value={amount.multiplication}
+                onChange={handleChange}
+              >
+                <MenuItem value={0.5}>1/2x</MenuItem>
+                <MenuItem value={1}>1x</MenuItem>
+                <MenuItem value={2}>2x</MenuItem>
+                <MenuItem value={3}>3x</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          <Typography
+            color='secondary'
+            variant='h5'
+            sx={{
+              paddingLeft: '1em'
+            }}
+          >
+            {yields !== undefined ? `Yields: ${new Fraction(amount.yield).toFraction(true)} ${yields.name}` : ''}
+          </Typography>
+        </Stack>
         
         <Typography
           color='secondary'
@@ -115,7 +125,7 @@ export default function RecipeCard(props: Recipe) {
             color='secondary'
             sx={{ textTransform: 'capitalize', marginBottom: '.25em' }}
           >
-            {i.amount} {i.amountName} {i.name}
+            {new Fraction(i.amount).toFraction(true)} {i.amountName} {i.name}
           </Typography>
         ))}
         
