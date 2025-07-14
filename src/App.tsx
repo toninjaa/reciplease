@@ -1,6 +1,9 @@
 import './App.css'
+import { useEffect, useState } from 'react';
 import { Recipe } from './Types/Recipe';
+import AddRecipeCard from './Components/AddRecipeCard';
 import RecipeBox from './Components/RecipeBox';
+import { RecipeContext } from './Context';
 
 function App() {
   const recipes: Recipe[] = [
@@ -33,9 +36,21 @@ function App() {
       source: 'www.therecipeplace.com',
     },
   ];
-  
+  // ! LEFT OFF HERE, TRYING TO HOOK UP CONTEXT SO WE CAN ADD RECIPES
+  // const context = useContext(RecipeContext);
+  const [recipesContext, setRecipesContext] = useState(recipes);
+
+  // useEffect(() => {
+  //   setRecipesContext(recipes);
+  // }, [recipesContext]);
+
   return (
-    <RecipeBox recipes={recipes} />
+    <RecipeContext value={recipesContext}>
+    {/* <> */}
+      <AddRecipeCard />
+      <RecipeBox recipes={recipesContext} />
+    {/* </> */}
+    </RecipeContext>
   )
 }
 
